@@ -47,8 +47,12 @@
           <p class="text-[11px] text-slate-300 truncate">맞춤 대사량 · AI 사진/음식 자동 분석</p>
         </div>
       </div>
-      <div class="flex items-center shrink-0">
-        <button id="openApiModalBtn" type="button" class="text-xs bg-slate-800 hover:bg-slate-700 border border-slate-700 px-3 py-1.5 rounded-xl font-bold flex items-center gap-1 transition shrink-0">
+      <div class="flex items-center gap-1.5 shrink-0">
+        <button id="downloadLatestBtn" type="button" class="text-[11px] bg-slate-800 hover:bg-slate-700 border border-slate-700 px-2.5 py-1.5 rounded-xl font-bold flex items-center gap-1 transition shrink-0" title="삼성 브라우저용 최신 파일 저장">
+          <span>📥</span>
+          <span>파일저장</span>
+        </button>
+        <button id="openApiModalBtn" type="button" class="text-xs bg-indigo-600 hover:bg-indigo-500 border border-indigo-400 px-2.5 py-1.5 rounded-xl font-bold flex items-center gap-1 transition shrink-0">
           <span>🔑</span>
           <span id="apiStatusText">AI 키</span>
         </button>
@@ -66,21 +70,29 @@
   <div id="apiModal" class="fixed inset-0 z-50 hidden bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-sm rounded-2xl p-4 shadow-2xl space-y-3">
       <div class="flex justify-between items-center border-b pb-2.5">
-        <h3 class="font-extrabold text-sm text-slate-900">🔑 Gemini 무료 API 키 설정</h3>
+        <h3 class="font-extrabold text-sm text-slate-900">🔑 Gemini AI 키 설정</h3>
         <button id="closeApiModalBtn" class="text-slate-400 hover:text-slate-700 text-lg font-bold px-1">&times;</button>
       </div>
       <div class="text-xs text-slate-600 space-y-1.5 leading-relaxed">
-        <p class="font-semibold text-blue-600">삼성 브라우저 등에서 직접 여실 때 AI 분석을 쓰려면 무료 키를 1회 등록해 주세요. (자동 저장됨)</p>
-        <p>1. <strong>aistudio.google.com</strong> 접속 → <strong>Get API key</strong> 발급</p>
-        <p>2. 아래 칸에 붙여넣고 <strong>[적용하기]</strong> 터치</p>
+        <p class="font-extrabold text-emerald-700 bg-emerald-50 p-2 rounded-lg border border-emerald-200">
+          💡 <strong>지금 이 화면(제미나이 캔버스)에서는 키 없이 바로 작동합니다!</strong> 키 입력칸을 비우고 [초기화(내장 AI)]를 누르시면 됩니다.
+        </p>
+        <div class="text-[11px] bg-slate-50 border border-slate-200 text-slate-700 p-2 rounded-lg space-y-1">
+          <div class="font-extrabold text-slate-900">삼성 브라우저에서 'has been suspended'가 뜨는 이유:</div>
+          <p>구글 AI 스튜디오의 신형 <strong>`AQ.` 키</strong>는 정상 키입니다. 다만 화면이나 채팅창에 노출되었거나 기존 프로젝트가 정지된 경우 차단됩니다. 키 발급 시 <strong>[Create API key in new project]</strong>를 선택해 완전히 새로운 프로젝트에서 발급받으셔야 합니다.</p>
+        </div>
       </div>
       <div>
-        <label class="block text-xs font-bold text-slate-700 mb-1">Gemini API Key</label>
-        <input type="password" id="customApiKeyInput" placeholder="AIzaSy... 키 입력" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <div class="flex items-center justify-between mb-1">
+          <label class="block text-xs font-bold text-slate-700">Gemini API Key 입력 (AQ... 또는 AIza...)</label>
+          <button id="toggleKeyVisBtn" type="button" class="text-[11px] font-bold text-blue-600">눈으로 확인(표시)</button>
+        </div>
+        <input type="text" id="customApiKeyInput" autocomplete="off" spellcheck="false" placeholder="신형 AQ... 또는 AIza... 키 붙여넣기" class="w-full px-3 py-2 text-xs font-mono border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
       </div>
+      <div id="apiTestResultBox" class="hidden p-2.5 rounded-xl text-xs font-bold leading-snug"></div>
       <div class="flex justify-end gap-2 pt-1">
-        <button id="clearApiKeyBtn" type="button" class="px-3 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200">초기화</button>
-        <button id="saveApiKeyBtn" type="button" class="px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 text-white hover:bg-blue-700">적용하기</button>
+        <button id="clearApiKeyBtn" type="button" class="px-3 py-2 rounded-xl text-xs font-bold bg-emerald-100 text-emerald-800 hover:bg-emerald-200">초기화 (내장 AI 사용)</button>
+        <button id="saveApiKeyBtn" type="button" class="px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 text-white hover:bg-blue-700">저장 및 연결 테스트</button>
       </div>
     </div>
   </div>
@@ -307,6 +319,7 @@
           <button type="button" onclick="quickPickFood('현미밥/잡곡밥 (1공기/210g)')" class="shrink-0 text-xs bg-white active:bg-slate-100 border border-slate-300 px-2.5 py-1 rounded-full font-bold">🍚 현미밥 1공기</button>
           <button type="button" onclick="quickPickFood('닭가슴살 (조리 100g)')" class="shrink-0 text-xs bg-white active:bg-slate-100 border border-slate-300 px-2.5 py-1 rounded-full font-bold">🍗 닭가슴살 100g</button>
           <button type="button" onclick="quickPickFood('삶은 계란 (전란 1개)')" class="shrink-0 text-xs bg-white active:bg-slate-100 border border-slate-300 px-2.5 py-1 rounded-full font-bold">🥚 삶은계란</button>
+          <button type="button" onclick="quickPickFood('인포켓치즈')" class="shrink-0 text-xs bg-white active:bg-slate-100 border border-slate-300 px-2.5 py-1 rounded-full font-bold">🧀 인포켓치즈</button>
           <button type="button" onclick="quickPickFood('단백질 보충제/프로틴 (1스쿱)')" class="shrink-0 text-xs bg-white active:bg-slate-100 border border-slate-300 px-2.5 py-1 rounded-full font-bold">🥤 프로틴 1스쿱</button>
           <button type="button" onclick="quickPickFood('순대국밥/돼지국밥 (밥 포함 1그릇)')" class="shrink-0 text-xs bg-white active:bg-slate-100 border border-slate-300 px-2.5 py-1 rounded-full font-bold">🍲 국밥 1그릇</button>
           <button type="button" onclick="quickPickFood('돼지고기 삼겹살 (구이 100g)')" class="shrink-0 text-xs bg-white active:bg-slate-100 border border-slate-300 px-2.5 py-1 rounded-full font-bold">🥓 삼겹살 100g</button>
@@ -398,6 +411,8 @@
       "우유 (1컵/200ml)": { unit: "ml", baseQty: 200, carb: 10, pro: 6, fat: 7, kcal: 127 },
       "무가당 두유 (1팩/190ml)": { unit: "팩", baseQty: 1, carb: 4, pro: 9, fat: 4.5, kcal: 92 },
       "그릭요거트 무가당 (100g)": { unit: "g", baseQty: 100, carb: 4, pro: 10, fat: 3, kcal: 83 },
+      "인포켓치즈": { unit: "개", baseQty: 1, carb: 0.5, pro: 6, fat: 4.2, kcal: 64 },
+      "슬라이스 치즈 (1장/18g)": { unit: "장", baseQty: 1, carb: 0.5, pro: 4, fat: 4.5, kcal: 58 },
       "아몬드/견과류 (1줌/25g)": { unit: "줌", baseQty: 1, carb: 5, pro: 5, fat: 13, kcal: 157 },
 
       "김치찌개 (1인분/밥 제외)": { unit: "인분", baseQty: 1, carb: 10, pro: 16, fat: 12, kcal: 212 },
@@ -452,7 +467,9 @@
         const savedDb = window.localStorage.getItem("diet_master_custom_db");
         if (savedDb) {
           const parsedDb = JSON.parse(savedDb);
+          delete parsedDb["인포켓치즈/스트링치즈 (1개/20g)"];
           Object.assign(FOOD_DB, parsedDb);
+          FOOD_DB["인포켓치즈"] = { unit: "개", baseQty: 1, carb: 0.5, pro: 6, fat: 4.2, kcal: 64 };
         }
         const savedProfile = window.localStorage.getItem("diet_master_profile");
         if (savedProfile) {
@@ -472,7 +489,7 @@
         if (savedKey) {
           userCustomApiKey = savedKey;
           document.getElementById("customApiKeyInput").value = savedKey;
-          document.getElementById("apiStatusText").textContent = "AI 키됨";
+          document.getElementById("apiStatusText").textContent = "외부키 켜짐";
         }
       } catch (e) {
         // 무시
@@ -685,7 +702,7 @@
       if (info) {
         document.getElementById("qtyLabel").textContent = `섭취량 (${info.unit})`;
         document.getElementById("foodQty").value = info.baseQty;
-        document.getElementById("foodQty").step = (info.unit === "g" || info.unit === "ml") ? 10 : 0.5;
+        document.getElementById("foodQty").step = (info.unit === "g" || info.unit === "ml") ? 10 : (info.unit === "개" ? 1 : 0.5);
       }
       updatePreview();
     }
@@ -721,28 +738,114 @@
       previewEl.innerHTML = `✅ <strong>${key} (${qty}${info.unit})</strong> 자동 계산 👉 탄수화물 <strong class="text-sky-600">${c}g</strong> · 단백질 <strong class="text-emerald-600">${p}g</strong> · 지방 <strong class="text-amber-600">${f}g</strong> · 총 <strong class="text-slate-900">${k}kcal</strong>`;
     }
 
-    // Gemini API 호출 헬퍼 (지수 백오프 적용)
-    async function callGeminiAPI(payload) {
-      const activeKey = userCustomApiKey || apiKey;
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${activeKey}`;
-      const delays = [1000, 2000, 4000];
+    // AI 응답에서 생각(thought) 파트나 설명 문구가 섞여 나와도 안전하게 JSON만 추출
+    function extractTextFromGeminiResult(result) {
+      const parts = result?.candidates?.[0]?.content?.parts || [];
+      // thought 파트가 아닌 실제 텍스트 파트를 우선 결합
+      const validTexts = parts
+        .filter(p => !p.thought && typeof p.text === "string")
+        .map(p => p.text);
+      if (validTexts.length > 0) return validTexts.join("\n");
+      // 만약 모든 파트가 일반 텍스트면 전체 결합
+      return parts.map(p => p.text || "").join("\n");
+    }
 
-      for (let attempt = 0; attempt <= delays.length; attempt++) {
+    function parseSafeJson(rawText) {
+      if (!rawText) throw new Error("AI 응답이 비어 있습니다.");
+      let cleaned = rawText.replace(/```json\s*/gi, "").replace(/```\s*/g, "").trim();
+      try {
+        return JSON.parse(cleaned);
+      } catch (e) {
+        // 앞뒤로 안내 문구가 섞인 경우 대괄호 [...] 또는 중괄호 {...} 구간만 정확히 추출
+        const arrMatch = cleaned.match(/\[[\s\S]*\]/);
+        const objMatch = cleaned.match(/\{[\s\S]*\}/);
+        if (arrMatch && (!objMatch || arrMatch.index < objMatch.index)) {
+          return JSON.parse(arrMatch[0]);
+        }
+        if (objMatch) {
+          return JSON.parse(objMatch[0]);
+        }
+    // Gemini API 호출 헬퍼 (신형 AQ. 키 및 구형 AIza. 키 완벽 지원 + 헤더/파라미터 이중 인증)
+    async function callGeminiAPI(payload) {
+      const customKey = getCleanApiKey();
+
+      // 1) 키가 비어있는 경우: 제미나이 캔버스/앱 환경 내장 AI로 자동 호출
+      if (!customKey) {
+        const defaultUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+        const response = await fetch(defaultUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          const msg = data?.error?.message || `HTTP ${response.status}`;
+          if (window.location.protocol === "file:" || window.location.protocol === "content:") {
+            document.getElementById("apiModal").classList.remove("hidden");
+            throw new Error("삼성 브라우저에서는 우측 상단 [🔑 AI 키]에 구글 AI 스튜디오에서 발급받은 무료 키를 등록해 주세요.");
+          }
+          throw new Error(`AI 응답 오류: ${msg}`);
+        }
+        return data;
+      }
+
+      // 2) 사용자가 직접 입력한 키 (신형 AQ. / 구형 AIza. 공통 지원)
+      // 무료 티어 할당량(RPM)이 가장 넉넉한 gemini-2.5-flash 및 2.0-flash 우선 시도
+      const modelsToTry = [
+        "gemini-2.5-flash",
+        "gemini-2.0-flash",
+        "gemini-1.5-flash"
+      ];
+
+      let lastError = null;
+
+      for (const modelName of modelsToTry) {
+        // 신형 AQ. 키 호환성을 위해 쿼리 파라미터와 x-goog-api-key 헤더를 모두 전달
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${customKey}`;
         try {
           const response = await fetch(url, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+              "Content-Type": "application/json",
+              "x-goog-api-key": customKey
+            },
             body: JSON.stringify(payload)
           });
+
+          const data = await response.json().catch(() => ({}));
+
           if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
+            const errMsg = data?.error?.message || `HTTP 오류 (${response.status})`;
+            
+            // 403 Suspended / Leaked Key
+            if (errMsg.includes("suspended") || errMsg.includes("CONSUMER_SUSPENDED")) {
+              throw new Error("⚠️ 해당 키(또는 연결된 GCP 프로젝트)가 구글 보안 정책에 의해 정지(Suspended)되었습니다. 구글 AI 스튜디오에서 'Create API key in new project'로 새 프로젝트를 생성해 키를 재발급받아 주세요.");
+            }
+            // 429 Too Many Requests (할당량 초과) -> 다음 모델로 재시도
+            if (response.status === 429 || errMsg.includes("quota") || errMsg.includes("RESOURCE_EXHAUSTED")) {
+              lastError = new Error("무료 호출 한도(분당 요청 수) 초과입니다. 잠시 후 다시 시도해 주세요.");
+              continue;
+            }
+            if (errMsg.includes("API_KEY_INVALID") || errMsg.includes("API key not valid")) {
+              throw new Error("API 키가 올바르지 않습니다. 복사할 때 앞뒤 공백이 들어갔는지 확인해 주세요.");
+            }
+            lastError = new Error(errMsg);
+            continue;
           }
-          return await response.json();
+
+          if (data?.candidates && data.candidates.length > 0) {
+            return data;
+          }
+          lastError = new Error("AI가 응답 데이터를 생성하지 못했습니다.");
         } catch (err) {
-          if (attempt === delays.length) throw err;
-          await new Promise(res => setTimeout(res, delays[attempt]));
+          lastError = err;
+          if (err.message.includes("정지(Suspended)") || err.message.includes("올바르지 않습니다")) {
+            throw err;
+          }
         }
       }
+
+      throw lastError || new Error("네트워크 연결 또는 API 키 권한을 확인해 주세요.");
     }
 
     // 내장 DB에 없는 음식명을 입력했을 때 Gemini AI가 영양성분을 계산하여 자동 등록
@@ -764,60 +867,47 @@
       addBtn.textContent = "🤖 AI 분석 중...";
 
       try {
-        const prompt = `사용자가 입력한 음식: "${rawName}" (수량/배수 힌트: ${qtyInput}).
-한국의 일반적인 1회 제공량(또는 음식명에 적힌 중량/개수) 기준으로 영양 성분을 추산해 JSON으로 반환하세요.`;
+        const prompt = `사용자가 입력한 음식: "${rawName}".
+이 음식의 일반적인 1단위(1개, 1인분, 1팩, 또는 100g) 기준 영양 성분을 추산해 아래 JSON 형식으로만 반환하세요. 설명 없이 순수 JSON만 출력하세요:
+{"foodName": "음식명 (1회 기준량)", "unit": "개", "baseQty": 1, "carb": 0, "pro": 0, "fat": 0, "kcal": 0}`;
 
         const payload = {
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            responseMimeType: "application/json",
-            responseSchema: {
-              type: "OBJECT",
-              properties: {
-                foodName: { type: "STRING", description: "표시할 음식명과 기준 중량 (예: 마라탕 (1인분/500g))" },
-                unit: { type: "STRING", description: "단위 (인분, 개, g, 그릇 등)" },
-                baseQty: { type: "NUMBER", description: "기준 수량 (예: 1 또는 100)" },
-                carb: { type: "NUMBER", description: "탄수화물(g)" },
-                pro: { type: "NUMBER", description: "단백질(g)" },
-                fat: { type: "NUMBER", description: "지방(g)" },
-                kcal: { type: "NUMBER", description: "총 칼로리(kcal)" }
-              },
-              required: ["foodName", "unit", "baseQty", "carb", "pro", "fat", "kcal"]
-            }
-          }
+          contents: [{ parts: [{ text: prompt }] }]
         };
 
         const result = await callGeminiAPI(payload);
-        const text = result?.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (!text) throw new Error("Empty AI response");
-
-        const item = JSON.parse(text);
-        const keyName = `✨ ${item.foodName}`;
+        const text = extractTextFromGeminiResult(result);
+        const item = parseSafeJson(text);
+        const keyName = `✨ ${item.foodName || rawName}`;
+        const baseQ = Number(item.baseQty) || 1;
 
         FOOD_DB[keyName] = {
           unit: item.unit || "인분",
-          baseQty: item.baseQty || 1,
-          carb: Math.round(item.carb * 10) / 10,
-          pro: Math.round(item.pro * 10) / 10,
-          fat: Math.round(item.fat * 10) / 10,
-          kcal: Math.round(item.kcal)
+          baseQty: baseQ,
+          carb: Math.round((Number(item.carb) || 0) * 10) / 10,
+          pro: Math.round((Number(item.pro) || 0) * 10) / 10,
+          fat: Math.round((Number(item.fat) || 0) * 10) / 10,
+          kcal: Math.round(Number(item.kcal) || 0)
         };
+
+        const appliedQty = qtyInput > 0 ? qtyInput : baseQ;
 
         mealLog.push({
           id: Date.now(),
           meal,
           foodKey: keyName,
-          qty: item.baseQty || 1
+          qty: appliedQty
         });
 
         document.getElementById("foodSearchInput").value = "";
+        document.getElementById("foodQty").value = 1;
         document.getElementById("customFoodDropdown").classList.add("hidden");
         saveStateToBrowser();
         renderTable();
         updateDashboard();
-        showToast(`🤖 AI가 '${keyName}' 영양성분을 계산하여 식단에 추가했습니다!`);
+        showToast(`🤖 '${keyName}' (${appliedQty}${FOOD_DB[keyName].unit}) 계산 완료!`);
       } catch (err) {
-        showToast("외부 브라우저에서 실행 중이시라면 우측 상단 [AI 키]에 무료 API 키를 입력해 주세요.");
+        showToast(`⚠️ AI 계산 실패: ${err.message}`);
       } finally {
         addBtn.disabled = false;
         aiBtn.disabled = false;
@@ -839,21 +929,21 @@
       area.classList.remove("hidden");
       resultListEl.innerHTML = "";
       statusEl.innerHTML = `
-        <span class="inline-block w-4 h-4 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></span>
+        <span class="inline-block w-4 h-4 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin shrink-0"></span>
         <span>Gemini AI가 사진 속 음식 종류와 양을 판독하고 있습니다...</span>
       `;
 
       try {
-        const base64DataUrl = await resizeAndEncodeImage(file, 900);
+        const base64DataUrl = await resizeAndEncodeImage(file, 800);
         previewImg.src = base64DataUrl;
         const base64Data = base64DataUrl.split(",")[1];
 
-        const prompt = `이 사진에 있는 모든 음식(또는 영양성분표)을 분석하여 각각의 음식 이름(추정 그램수나 개수 포함), 탄수화물(g), 단백질(g), 지방(g), 총 칼로리(kcal)를 한국어 JSON 배열로 반환해 주세요.`;
+        const prompt = `이 사진에 있는 모든 음식(또는 영양성분표)을 분석하여 각각의 음식 이름(추정 분량 포함), 탄수화물(g), 단백질(g), 지방(g), 총 칼로리(kcal)를 아래 JSON 배열 형식으로만 반환해 주세요. 다른 설명 없이 순수 JSON 배열만 출력하세요.
+[{"foodName": "음식명 (추정 분량)", "carb": 0, "pro": 0, "fat": 0, "kcal": 0}]`;
 
         const payload = {
           contents: [
             {
-              role: "user",
               parts: [
                 { text: prompt },
                 {
@@ -864,46 +954,31 @@
                 }
               ]
             }
-          ],
-          generationConfig: {
-            responseMimeType: "application/json",
-            responseSchema: {
-              type: "ARRAY",
-              items: {
-                type: "OBJECT",
-                properties: {
-                  foodName: { type: "STRING", description: "음식명 및 추정 분량 (예: 제육볶음 (1인분/250g))" },
-                  carb: { type: "NUMBER", description: "탄수화물(g)" },
-                  pro: { type: "NUMBER", description: "단백질(g)" },
-                  fat: { type: "NUMBER", description: "지방(g)" },
-                  kcal: { type: "NUMBER", description: "칼로리(kcal)" }
-                },
-                required: ["foodName", "carb", "pro", "fat", "kcal"]
-              }
-            }
-          }
+          ]
         };
 
         const result = await callGeminiAPI(payload);
-        const text = result?.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (!text) throw new Error("Empty image analysis");
+        const text = extractTextFromGeminiResult(result);
+        let detectedFoods = parseSafeJson(text);
+        if (detectedFoods && !Array.isArray(detectedFoods) && typeof detectedFoods === "object") {
+          detectedFoods = [detectedFoods];
+        }
 
-        const detectedFoods = JSON.parse(text);
         if (!Array.isArray(detectedFoods) || detectedFoods.length === 0) {
-          statusEl.innerHTML = `<span class="text-red-600 font-bold">⚠️ 사진에서 음식을 명확히 찾지 못했습니다. 다시 촬영해 주세요.</span>`;
+          statusEl.innerHTML = `<span class="text-red-600 font-bold">⚠️ 사진에서 음식을 찾지 못했습니다. 다시 촬영해 주세요.</span>`;
           return;
         }
 
         const summaryHtml = [];
         detectedFoods.forEach((f, idx) => {
-          const keyName = `📸 ${f.foodName}`;
+          const keyName = `📸 ${f.foodName || "사진 분석 음식"}`;
           FOOD_DB[keyName] = {
             unit: "인분",
             baseQty: 1,
-            carb: Math.round((f.carb || 0) * 10) / 10,
-            pro: Math.round((f.pro || 0) * 10) / 10,
-            fat: Math.round((f.fat || 0) * 10) / 10,
-            kcal: Math.round(f.kcal || 0)
+            carb: Math.round((Number(f.carb) || 0) * 10) / 10,
+            pro: Math.round((Number(f.pro) || 0) * 10) / 10,
+            fat: Math.round((Number(f.fat) || 0) * 10) / 10,
+            kcal: Math.round(Number(f.kcal) || 0)
           };
           mealLog.push({
             id: Date.now() + idx,
@@ -922,7 +997,7 @@
         updateDashboard();
         showToast(`📸 사진 속 음식 ${detectedFoods.length}종이 식단에 자동 반영되었습니다!`);
       } catch (err) {
-        statusEl.innerHTML = `<span class="text-red-600 font-bold">⚠️ AI 이미지 분석 실패: 외부 웹사이트/삼성 브라우저에서 실행 중이라면 우측 상단 [🔑 AI 키]에서 무료 키를 입력해 주세요.</span>`;
+        statusEl.innerHTML = `<span class="text-red-600 font-bold">⚠️ AI 이미지 분석 오류: ${err.message}</span>`;
       } finally {
         event.target.value = "";
       }
@@ -1035,7 +1110,7 @@
         const p = (info.pro * ratio).toFixed(1);
         const f = (info.fat * ratio).toFixed(1);
         const k = Math.round(info.kcal * ratio);
-        const step = (info.unit === "g" || info.unit === "ml") ? 10 : 0.5;
+        const step = (info.unit === "g" || info.unit === "ml") ? 10 : (info.unit === "개" ? 1 : 0.5);
 
         const card = document.createElement("div");
         card.className = "p-3 rounded-xl bg-slate-50 border border-slate-200 space-y-2";
@@ -1117,18 +1192,74 @@
       document.getElementById("closeApiModalBtn").addEventListener("click", () => {
         document.getElementById("apiModal").classList.add("hidden");
       });
-      document.getElementById("saveApiKeyBtn").addEventListener("click", () => {
-        userCustomApiKey = document.getElementById("customApiKeyInput").value.trim();
-        document.getElementById("apiStatusText").textContent = userCustomApiKey ? "AI 키됨" : "AI 키";
+      document.getElementById("toggleKeyVisBtn").addEventListener("click", () => {
+        const inp = document.getElementById("customApiKeyInput");
+        inp.type = inp.type === "password" ? "text" : "password";
+      });
+      document.getElementById("downloadLatestBtn").addEventListener("click", () => {
+        const htmlContent = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+        const blob = new Blob([htmlContent], { type: "text/html;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "diet_calculator.html";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast("📥 최신 버전 파일이 저장되었습니다! 삼성 브라우저에서 이 파일을 여세요.");
+      });
+      document.getElementById("saveApiKeyBtn").addEventListener("click", async () => {
+        const saveBtn = document.getElementById("saveApiKeyBtn");
+        const testBox = document.getElementById("apiTestResultBox");
+        userCustomApiKey = document.getElementById("customApiKeyInput").value.trim().replace(/['"\s]+/g, "");
+        document.getElementById("customApiKeyInput").value = userCustomApiKey;
         saveStateToBrowser();
-        document.getElementById("apiModal").classList.add("hidden");
-        showToast(userCustomApiKey ? "🔑 Gemini API 키가 저장되었습니다." : "기본 모드로 설정되었습니다.");
+
+        if (!userCustomApiKey) {
+          document.getElementById("apiStatusText").textContent = "내장 AI";
+          testBox.className = "p-2.5 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200";
+          testBox.textContent = "✅ 별도 키 없이 제미나이 앱 기본 내장 AI 모드로 설정되었습니다!";
+          testBox.classList.remove("hidden");
+          return;
+        }
+
+        saveBtn.disabled = true;
+        saveBtn.textContent = "연결 확인 중...";
+        testBox.className = "p-2.5 rounded-xl text-xs font-bold bg-blue-50 text-blue-800 border border-blue-200";
+        testBox.textContent = "🔄 신형 Gemini AI 규격으로 연결을 테스트하고 있습니다...";
+        testBox.classList.remove("hidden");
+
+        try {
+          await callGeminiAPI({
+            contents: [{ parts: [{ text: "hi" }] }]
+          });
+          document.getElementById("apiStatusText").textContent = "AI 연결됨";
+          testBox.className = "p-2.5 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200";
+          testBox.textContent = "✅ 신형 AQ 키 연결 성공! 사진 분석 및 AI 계산이 정상 작동합니다.";
+          showToast("✅ Gemini API 키가 정상 연결되었습니다!");
+          setTimeout(() => {
+            document.getElementById("apiModal").classList.add("hidden");
+          }, 1200);
+        } catch (err) {
+          document.getElementById("apiStatusText").textContent = "키 오류";
+          testBox.className = "p-2.5 rounded-xl text-xs font-bold bg-red-50 text-red-700 border border-red-200";
+          testBox.textContent = `❌ 연결 실패: ${err.message}`;
+        } finally {
+          saveBtn.disabled = false;
+          saveBtn.textContent = "저장 및 연결 테스트";
+        }
       });
       document.getElementById("clearApiKeyBtn").addEventListener("click", () => {
         document.getElementById("customApiKeyInput").value = "";
         userCustomApiKey = "";
         try { window.localStorage.removeItem("diet_master_api_key"); } catch (e) {}
-        document.getElementById("apiStatusText").textContent = "AI 키";
+        document.getElementById("apiStatusText").textContent = "내장 AI";
+        const testBox = document.getElementById("apiTestResultBox");
+        testBox.className = "p-2.5 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200";
+        testBox.textContent = "✅ 초기화 완료! 지금 이 창에서는 키 없이 내장 AI로 바로 사진/음식 분석이 작동합니다.";
+        testBox.classList.remove("hidden");
+        showToast("✅ 내장 AI 모드로 전환되었습니다. 바로 사용해 보세요!");
       });
 
       // 초기 실행
